@@ -1,14 +1,6 @@
-#!/bin/bash
-echo "Copiando novo source list"
-if !cp -u sources.list /etc/apt
-then
-    echo "Não foi copiar"
-    exit 1
-fi
-echo "copia feita com sucesso"
-
-sed -i -e 's/deb http/deb [arch=amd64] http/' "/etc/apt/sources.list.d/google-chrome.list"
-wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add -
+echo "instalar google chrome"
+sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
+wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
 
 echo "Atualizando repositórios.."
 if ! apt-get update
@@ -35,6 +27,7 @@ then
     exit 1
 fi
 echo "Atualização de pacotes feita com sucesso"
+
 
 echo "remover softwares desnecessários"
 if ! apt-get remove  mousepad
@@ -79,15 +72,9 @@ echo "limpeza concluída"
 
 echo "instalar whisker menu"
 
-if ! apt-get install xfce4-whiskermenu-plugin 
-then
-    echo "Não foi possível instalar o whisker"
-    exit 1
-fi
-echo "whisker instalador com sucesso"
 
 echo "instalar jogos"
-if ! apt-get install gcompris ktuberling tuxmath tuxpaint gnome-chess supertux minetest
+if ! apt-get install gcompris-qt ktuberling tuxmath tuxpaint gnome-chess supertux minetest scratch 
 then
     echo "Não foi possível instalar o pacote"
     exit 1
@@ -95,7 +82,7 @@ fi
 echo "Instalação finalizada"
 
 echo "instalar pacotes uteis"
-if ! apt-get install kde-l10n-ptbr artha p7zip-rar curl wget apt-transport-https dirmngr
+if ! apt-get -yinstall kde-l10n-ptbr artha p7zip-rar curl wget apt-transport-https dirmngr gdebi google-chrome-stable
 then
     echo "Não foi possível instalar o pacote $1"
     #exit 1
@@ -103,7 +90,7 @@ fi
 echo "Instalação finalizada"
 
 echo "Instalar softwares utilitários"
-if ! apt-get install pidgin nautilus gedit geany epoptes-client
+if ! apt-get -y install pidgin nautilus gedit geany epoptes-client xdotool
 then
     echo "Não foi possível instalar o pacote"
     exit 1
@@ -112,20 +99,36 @@ echo "Instalação finalizada"
 
 
 echo "instalar softwares educativos"
-if ! apt-get install klavaro ktouch
+if ! apt-get -y install klavaro ktouch kturtle
 then
     echo "Não foi possível instalar o pacote"
     exit 1
 fi
 echo "Instalação finalizada"
 
-echo "iniciar epoptes"
-if ! epoptes-client -c
-then
-    echo "Não foi possível iniciar o epoptes"
-    exit 1
-fi
-echo "Instalação finalizada"
+rm /usr/share/xfce4/backdrops/book*
+rm /usr/share/xfce4/backdrops/sele*
+rm /usr/share/xfce4/backdrops/e*
+rm /usr/share/xfce4/backdrops/k*
+rm /usr/share/xfce4/backdrops/linux*
+
+apt-get install -y google-chrome-stable
+
+echo ".....CONFIGURANDO EPOPTES CLIENT....."
+sleep 2
+echo "DIGITE O IP DO SERVIDOR COM OS PONTOS"
+read ip;
+sed -i "s/#SERVER=server/SERVER=$ip/g" /etc/default/epoptes-client
+epoptes-client -c
+echo "Reiniciando."
+sleep 2
+echo "Reiniciando.."
+sleep 2
+echo "Reiniciando..."
+sleep 2
+shutdown
 
 echo "Configuração finalizada"
+
+
 reboot
